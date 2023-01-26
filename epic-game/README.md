@@ -1,19 +1,15 @@
-# Sample Hardhat Project
+# NFT-Gaming 
 
 
 
 Try running some of the following tasks:
 
 ```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
+
+You can clone the project here https://github.com/ronkips/Nft-Gaming.git
+cd Nft-Gaming
+npm init
 npx hardhat run scripts/deploy.js
+
+
 ```
-git init
-git add .
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/ronkips/Nft-Gaming.git
-git push -u origin main
