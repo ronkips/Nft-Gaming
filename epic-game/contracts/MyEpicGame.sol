@@ -13,6 +13,8 @@ import "hardhat/console.sol";
 
 // Our contract inherits from ERC721, which is the standard NFT contract!
 contract MyEpicGame is ERC721 {
+    uint randNonce = 0;
+
     struct CharacterAttributes {
         uint characterIndex;
         string name;
@@ -174,5 +176,75 @@ contract MyEpicGame is ERC721 {
         );
 
         return output;
+    }
+
+    function attackBoss() public {
+        // Get the state of the player's NFT.
+        uint256 nftTokenIdOfPlayer = nftHolders[msg.sender];
+        CharacterAttributes storage player = nftHolderAttributes[
+            nftTokenIdOfPlayer
+        ];
+        console.log(
+            "\nPlayer w/ character %s about to attack. Has %s HP and %s AD",
+            player.name,
+            player.hp,
+            player.attackDamage
+        );
+        console.log(
+            "Boss %s has %s HP and %s AD",
+            bigBoss.name,
+            bigBoss.hp,
+            bigBoss.attackDamage
+        );
+        // Make sure the player has more than 0 HP.
+
+        require(player.hp > 0, "Error: character must have HP to attack boss.");
+        // Make sure the boss has more than 0 HP.
+        require(
+            bigBoss.hp > 0,
+            "Error: boss must have HP to attack character."
+        );
+        // Allow player to attack boss.
+        if (bigBoss.hp < player.attackDamage) {
+            bigBoss.hp = 0;
+            console.log("The boss is dead!");
+        } else {
+            if (randomInt(10) > 5) {
+                // by passing 10 as the mod, we elect to only grab the last digit (0-9) of the hash!
+                bigBoss.hp = bigBoss.hp - player.attackDamage;
+                console.log(
+                    "%s attacked boss. New boss hp: %s",
+                    player.name,
+                    bigBoss.hp
+                );
+            } else {
+                console.log("%s missed!\n", player.name);
+            }
+        }
+        // Allow boss to attack player.
+
+        if (player.hp < bigBoss.attackDamage) {
+            player.hp = 0;
+        } else {
+            player.hp = player.hp - bigBoss.attackDamage;
+        }
+        //console for eas
+        console.log("Player attacked boss. New boss hp: %s", bigBoss.hp);
+        console.log("Boss attacked player. New player hp: %s\n", player.hp);
+    }
+
+    function randomInt(uint _modulus) internal returns (uint) {
+        // internal to be called on the contract itself
+        randNonce++; // increase nonce
+        return
+            uint(
+                keccak256(
+                    abi.encodePacked(
+                        block.timestamp, //current time
+                        msg.sender, // your address
+                        randNonce // modulo using the _modulus argument
+                    )
+                )
+            ) % _modulus; // modulo using the _modulus argument
     }
 }
