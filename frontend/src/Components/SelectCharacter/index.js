@@ -37,29 +37,73 @@ const SelectCharacter = ({ setCharacterNFT }) => {
     const getCharacters = async () => {
       try {
         console.log("Getting contract characters to mint");
-        // call contract to get all mint-able characters
-        const characterTxn = await gameContract.getAllDefaultCharacters();
-        console.log("your characterTxn is:", characterTxn);
 
-        // Go through all the characters and transform the data
-        const characters = characterTxn.map((CharacterData) =>
-          transformCharacterData(CharacterData)
+        const charactersTxn = await gameContract.getAllDefaultCharacters();
+        console.log("charactersTxn:", charactersTxn);
+
+        const characters = charactersTxn.map((characterData) =>
+          transformCharacterData(characterData)
         );
 
-        //set all mint -able characters
         setCharacters(characters);
       } catch (error) {
-        console.error(
-          "Sorry something went wrong while fetchingsome characters",
-          error
-        );
+        console.error("Something went wrong fetching characters:", error);
       }
     };
-    // If our gameCharacters are ready , let's get characters
+
+    /*
+     * Add a callback method that will fire when this event is received
+     */
+    const onCharacterMint = async (sender, tokenId, characterIndex) => {
+      console.log(
+        `CharacterNFTMinted - sender: ${sender} tokenId: ${tokenId.toNumber()} characterIndex: ${characterIndex.toNumber()}`
+      );
+      alert(
+        `Your NFT is all done -- see it here: https://goerli.pixxiti.com/nfts/${CONTRACT_ADDRESS}/${tokenId.toNumber()}`
+      );
+
+      /*
+       * Once our character NFT is minted we can fetch the metadata from our contract
+       * and set it in state to move onto the Arena
+       */
+      if (gameContract) {
+        const characterNFT = await gameContract.checkIfUserHasNFT();
+        console.log("CharacterNFT: ", characterNFT);
+        setCharacterNFT(transformCharacterData(characterNFT));
+      }
+    };
+
     if (gameContract) {
       getCharacters();
+
+      /*
+       * Setup NFT Minted Listener
+       */
+      gameContract.on("CharacterNFTMinted", onCharacterMint);
     }
+
+    return () => {
+      /*
+       * When your component unmounts, let;s make sure to clean up this listener
+       */
+      if (gameContract) {
+        gameContract.off("CharacterNFTMinted", onCharacterMint);
+      }
+    };
   }, [gameContract]);
+
+  const mintCharacterNFTAction = async (characterId) => {
+    try {
+      if (gameContract) {
+        console.log("Minting characters in progress");
+        const mintTxn = await gameContract.mintCharacterNFT(characterId);
+        await mintTxn.wait();
+        console.log("mintTxn...:", mintTxn);
+      }
+    } catch (error) {
+      console.warn("MintCharacterAction Error", error);
+    }
+  };
 
   //Render component
   const renderCharacters = () =>
@@ -72,20 +116,20 @@ const SelectCharacter = ({ setCharacterNFT }) => {
         <button
           type="button"
           className="character-mint-button"
-          // onClick={() => mintCharacterNFTAction(index)}
+          onClick={() => mintCharacterNFTAction(index)}
         >{`Mint ${character.name}`}</button>
       </div>
     ));
 
-return (
-  <div className="select-character-container">
-    <h2>Mint Your Hero. Choose wisely.</h2>
-    {/* Only show this when there are characters in state */}
-    {characters.length > 0 && (
-      <div className="character-grid">{renderCharacters()}</div>
-    )}
-  </div>
-);
+  return (
+    <div className="select-character-container">
+      <h2>Mint Your Hero. Choose wisely.</h2>
+      {/* Only show this when there are characters in state */}
+      {characters.length > 0 && (
+        <div className="character-grid">{renderCharacters()}</div>
+      )}
+    </div>
+  );
 };
 
 export default SelectCharacter;
