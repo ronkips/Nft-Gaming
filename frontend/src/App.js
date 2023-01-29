@@ -5,6 +5,7 @@ import SelectCharacter from "./Components/SelectCharacter";
 import myEpicGame from "./utils/MyEpicGame.json";
 import { CONTRACT_ADDRESS, transformCharacterData } from "./constants";
 import { ethers } from "ethers";
+import Arena from "./Components/Arena";
 // Constants
 const TWITTER_HANDLE = "ronkips01";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
@@ -104,6 +105,14 @@ const App = () => {
        */
     } else if (currentAccount && !characterNFT) {
       return <SelectCharacter setCharacterNFT={setCharacterNFT} />;
+    }
+    //If there is a connected wallet and characterNFT, it's time to battle!
+    else if (currentAccount && characterNFT) {
+      return (
+        // <Arena characterNFT={characterNFT} currentAccount={currentAccount} />  
+        <Arena characterNFT={characterNFT} setCharacterNFT={setCharacterNFT} />
+
+      );
     }
   };
 
