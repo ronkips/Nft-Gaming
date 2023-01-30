@@ -9,6 +9,8 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
   const [gameContract, setGameContract] = useState(null);
   const [boss, setBoss] = useState(null);
   const [attackState, setAttackState] = useState("");
+  //toast state management
+  const [showToast, setShowToast] = useState(false);
 
   const runAttackAction = async () => {
     try {
@@ -19,6 +21,11 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
         await attackTxn.wait();
         console.log("attackTxn...:", attackTxn);
         setAttackState("hit");
+        //Setting toast state to true and then false 5 seconds later
+        setShowToast(true);
+        setTimeout(() => {
+          setShowToast(false);
+        }, 5000);
       }
     } catch (error) {
       console.error("Error attacking boss:", error);
@@ -97,6 +104,11 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
 
   return (
     <div className="arena-container">
+      {boss && characterNFT && (
+        <div id="toast" className={showToast ? "show" : ""}>
+          <div id="desc">{`💥 ${boss.name} was hit for ${characterNFT.characterNFT.attackDamage}!`}</div>
+        </div>
+      )}
       {/* Replace your Boss UI with this */}
       {boss && (
         <div className="boss-container">
@@ -149,6 +161,10 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
               </div>
             </div>
           </div>
+          {/* <div className="active-players">
+          <h2>Active Players</h2>
+          <div className="players-list">{renderActivePlayersList()}</div>
+        </div> */}
         </div>
       )}
     </div>
