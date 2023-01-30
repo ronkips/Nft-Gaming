@@ -39,7 +39,7 @@ const SelectCharacter = ({ setCharacterNFT }) => {
         console.log("Getting contract characters to mint");
 
         const charactersTxn = await gameContract.getAllDefaultCharacters();
-        console.log("charactersTxn:", charactersTxn);
+        console.log("charactersTxn..:", charactersTxn);
 
         const characters = charactersTxn.map((characterData) =>
           transformCharacterData(characterData)
@@ -95,7 +95,7 @@ const SelectCharacter = ({ setCharacterNFT }) => {
   const mintCharacterNFTAction = async (characterId) => {
     try {
       if (gameContract) {
-        console.log("Minting characters in progress");
+        console.log("Minting characters in progress...");
         const mintTxn = await gameContract.mintCharacterNFT(characterId);
         await mintTxn.wait();
         console.log("mintTxn...:", mintTxn);
@@ -123,7 +123,7 @@ const SelectCharacter = ({ setCharacterNFT }) => {
 
   return (
     <div className="select-character-container">
-      <h2>Mint Your Hero. Choose wisely.</h2>
+      <h2>Mint Your Hero. Please choose wisely.</h2>
       {/* Only show this when there are characters in state */}
       {characters.length > 0 && (
         <div className="character-grid">{renderCharacters()}</div>

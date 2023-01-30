@@ -9,6 +9,7 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
   const [boss, setBoss] = useState(null);
   const [attackState, setAttackState] = useState("");
 
+
   const runAttackAction = async () => {
     try {
       if (gameContract) {
@@ -16,7 +17,7 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
         console.log("Attacking boss...");
         const attackTxn = await gameContract.attackBoss();
         await attackTxn.wait();
-        console.log("attackTxn:", attackTxn);
+        console.log("attackTxn...:", attackTxn);
         setAttackState("hit");
       }
     } catch (error) {
@@ -56,6 +57,7 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
       const bossHp = newBossHp.toNumber();
       const playerHp = newPlayerHp.toNumber();
       const sender = from.toString();
+      console.log(playerHp);
 
       console.log(`AttackComplete: Boss Hp: ${bossHp} Player Hp: ${playerHp}`);
 
@@ -74,6 +76,8 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
           return { ...prevState, hp: bossHp };
         });
       }
+
+      onAttackComplete();
     };
 
     if (gameContract) {
@@ -120,18 +124,21 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
             <h2>My Character</h2>
             <div className="player">
               <div className="image-content">
-                <h2>{characterNFT.name}</h2>
+                <h2>{characterNFT.characterNFT.name}</h2>
                 <img
-                  src={characterNFT.imageURI}
-                  alt={`Character ${characterNFT.name}`}
+                  src={characterNFT.characterNFT.imageURI}
+                  alt={`Character ${characterNFT.characterNFT.name}`}
                 />
                 <div className="health-bar">
-                  <progress value={characterNFT.hp} max={characterNFT.maxHp} />
-                  <p>{`${characterNFT.hp} / ${characterNFT.maxHp} HP`}</p>
+                  <progress
+                    value={characterNFT.characterNFT.hp}
+                    max={characterNFT.characterNFT.maxHp}
+                  />
+                  <p>{`${characterNFT.characterNFT.hp} / ${characterNFT.characterNFT.maxHp} HP`}</p>
                 </div>
               </div>
               <div className="stats">
-                <h4>{`⚔️ Attack Damage: ${characterNFT.attackDamage}`}</h4>
+                <h4>{`⚔️ Attack Damage: ${characterNFT.characterNFT.attackDamage}`}</h4>
               </div>
             </div>
           </div>
