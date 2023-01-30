@@ -3,12 +3,12 @@ import { ethers } from "ethers";
 import { CONTRACT_ADDRESS, transformCharacterData } from "../../constants";
 import myEpicGame from "../../utils/MyEpicGame.json";
 import "./Arena.css";
+import LoadingIndicator from "../LoadingIndicator";
 const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
   // State
   const [gameContract, setGameContract] = useState(null);
   const [boss, setBoss] = useState(null);
   const [attackState, setAttackState] = useState("");
-
 
   const runAttackAction = async () => {
     try {
@@ -49,7 +49,7 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
     //Setup async function that will get the boss from our contract and sets in state
     const fetchBoss = async () => {
       const bossTxn = await gameContract.getBigBoss();
-      console.log("Boss", bossTxn);
+      console.log("The Boss:", bossTxn);
       setBoss(transformCharacterData(bossTxn));
     };
     //Setup logic when this event is fired off
@@ -57,7 +57,7 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
       const bossHp = newBossHp.toNumber();
       const playerHp = newPlayerHp.toNumber();
       const sender = from.toString();
-      console.log(playerHp);
+      console.log(sender);
 
       console.log(`AttackComplete: Boss Hp: ${bossHp} Player Hp: ${playerHp}`);
 
@@ -115,6 +115,13 @@ const Arena = (characterNFT, setCharacterNFT, currentAccount) => {
               {`💥 Attack ${boss.name}`}
             </button>
           </div>
+          {/* Add this right under your attack button */}
+          {attackState === "attacking" && (
+            <div className="loading-indicator">
+              <LoadingIndicator />
+              <p>Attacking ⚔️</p>
+            </div>
+          )}
         </div>
       )}
 

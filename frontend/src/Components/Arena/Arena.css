@@ -167,6 +167,17 @@
 .boss-container .hit {
   animation: hit-bounce 1s ease;
 }
+.boss-container .loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 25px;
+}
+
+.boss-container .loading-indicator p {
+  font-weight: bold;
+  font-size: 28px;
+}
 
 @keyframes shake {
   10%,

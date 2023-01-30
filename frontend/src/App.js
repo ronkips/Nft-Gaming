@@ -6,6 +6,7 @@ import myEpicGame from "./utils/MyEpicGame.json";
 import { CONTRACT_ADDRESS, transformCharacterData } from "./constants";
 import { ethers } from "ethers";
 import Arena from "./Components/Arena";
+import LoadingIndicator from "./Components/LoadingIndicator";
 // Constants
 const TWITTER_HANDLE = "ronkips01";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
@@ -14,6 +15,7 @@ const App = () => {
   //useState
   const [currentAccount, setCurrentAccount] = useState(null);
   const [characterNFT, setCharacterNFT] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // implement the connect wallet
   const connectWalletAction = async () => {
@@ -43,6 +45,8 @@ const App = () => {
 
       if (!ethereum) {
         console.log("Make sure you have MetaMask!");
+        //We set isLoading here because we use return in the next line
+        setIsLoading(false);
         return;
       } else {
         console.log("We have the ethereum object", ethereum);
@@ -65,7 +69,8 @@ const App = () => {
       }
     } catch (error) {
       console.log(error);
-    }
+    } //We release the state property after all the function logic
+    setIsLoading(false);
   };
 
   //checking the network
@@ -81,6 +86,11 @@ const App = () => {
   // checkNetwork()
   //Render Methods
   const renderContent = () => {
+    //If the app is currently loading, just render out LoadingIndicator
+    if (isLoading) {
+      return <LoadingIndicator />;
+    }
+
     /*
      * Scenario #1
      */
@@ -109,16 +119,16 @@ const App = () => {
     //If there is a connected wallet and characterNFT, it's time to battle!
     else if (currentAccount && characterNFT) {
       return (
-        // <Arena characterNFT={characterNFT} currentAccount={currentAccount} />  
+        // <Arena characterNFT={characterNFT} currentAccount={currentAccount} />
         <Arena characterNFT={characterNFT} setCharacterNFT={setCharacterNFT} />
-
       );
     }
   };
 
   useEffect(() => {
+    setIsLoading(true);
+
     checkIfWalletIsConnected();
-    // checkNetwork();
     connectWalletAction();
   }, []);
 
@@ -139,9 +149,11 @@ const App = () => {
       if (txn.name) {
         console.log("User has character NFT");
         setCharacterNFT(transformCharacterData(txn));
-      } else {
-        console.log("No character NFT found");
       }
+      setIsLoading(false);
+      // else {
+      //   console.log("No character NFT found");
+      // }
     };
     //We only want to run this, if we have a connected wallet
     if (currentAccount) {
